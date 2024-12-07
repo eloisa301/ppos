@@ -1,0 +1,58 @@
+Main INICIO
+Task A1 created...
+Task A2 created...
+Task B1 created...
+Task B2 created...
+Main waits for A1...
+
+Iniciando: A1
+
+[000001] A1 zig (0)
+Iniciando:     A2
+
+Iniciando:                          B1
+
+[000001]                          B1 zag (0)
+Iniciando:                              B2
+
+[000001]     A2 zig (0)
+[000001]                              B2 zag (0)
+[000001] A1 zig (1)
+[000001]                          B1 zag (1)
+[000001]     A2 zig (1)
+[000001]                              B2 zag (1)
+[000001] A1 zig (2)
+[000001]                          B1 zag (2)
+[000001]     A2 zig (2)
+[000001]                              B2 zag (2)
+[000001] A1 zig (3)
+[000001]                          B1 zag (3)
+[000001]     A2 zig (3)
+[000001]                              B2 zag (3)
+[000001] A1 zig (4)
+[000001]                          B1 zag (4)
+[000001]     A2 zig (4)
+[000001]                              B2 zag (4)
+[000001] A1 zig (5)
+[000001]                          B1 zag (5)
+[000001]     A2 zig (5)
+[000001]                              B2 zag (5)
+[000001] A1 zig (6)
+[000001]                          B1 zag (6)
+[000001]     A2 zig (6)
+[000001]                              B2 zag (6)
+[000001] A1 zig (7)
+[000001]                          B1 zag (7)
+[000001]     A2 zig (7)
+[000001]                              B2 zag (7)
+[000001] A1 zig (8)
+[000001]                          B1 zag (8)
+[000001]     A2 zig (8)
+[000001]                              B2 zag (8)
+[000001] A1 zig (9)
+[000001]                          B1 zag (9)
+[000001]     A2 zig (9)Main waits for A2...
+
+[000001]                              B2 zag (9)Main waits for B1...
+Main waits for B2...
+Main FIM
