@@ -411,3 +411,8 @@ diskrequest_t* disk_scheduler(diskrequest_t* queue) {
     }
     return NULL;
 }
+
+int sem_init (semaphore_t *s, int value) {
+    s->counter = value;
+    s->queue = NULL;
+}
