@@ -401,7 +401,7 @@ int after_mqueue_msgs (mqueue_t *queue) {
 // Essa função implemeneta o escalonador de requisicoes de 
 // leitura/scrita do disco usado pelo gerenciador do disco
 // A função implementa a política FCFS.
-diskrequest_t* disk_scheduler(diskrequest_t* queue) {
+/*diskrequest_t* disk_scheduler(diskrequest_t* queue) {
      // FCFS scheduler
     if ( queue != NULL ) {
         PPOS_PREEMPT_DISABLE
@@ -411,8 +411,58 @@ diskrequest_t* disk_scheduler(diskrequest_t* queue) {
     }
     return NULL;
 }
-
-int sem_init (semaphore_t *s, int value) {
+*/
+/*int sem_init (semaphore_t *s, int value) {
     s->counter = value;
     s->queue = NULL;
+}*/
+
+int sem_create (semaphore_t *s, int value) {
+    s->counter = value;
+    s->queue = NULL;
+}
+
+int sem_down(semaphore_t *s) {
+    s->counter = s->counter - 1;
+    if(s->counter < 0){
+        //queue_append(,); // Coloca a tarefa na fila, implementar a função
+        //task_suspend(,); // Suspende a tarefa, implementar funcção
+    }
+    
+}
+
+int sem_up(semaphore_t *s) {
+    s->counter = s->counter + 1;
+    if(s->counter <= 0){
+        //task_resume(); // Devolve a Tarefa a fila de prontas, implementar
+    }
+    
+}
+
+int sem_destroy(semaphore_t *s){
+
+}
+
+int task_create(task_t *task, void (*start_func)(void *), void *arg){
+    printf("teste");
+}
+
+void task_yield(){
+
+}
+
+void task_exit(int exitCode){
+
+}
+
+int task_join(task_t *task){
+
+}
+
+unsigned int systime (){
+
+}
+
+void ppos_init (){
+
 }
