@@ -29,7 +29,9 @@ int sem_down(semaphore_t *s)
     s->counter = s->counter - 1;
     if (s->counter < 0)
     {
+        queue_add(&s->queue, taskExec);
         task_suspend(taskExec, &(s->queue));
+        return 0;
     }
     return 0;
 }
@@ -60,11 +62,14 @@ int task_create(task_t *task, void (*start_func)(void *), void *arg)
     {
         task_t *aux;
         readyQueue = aux;
+        taskExec = task;
+        task->state = PPOS_TASK_STATE_EXECUTING;
+        return 1;
     }
-
+    // void (*start_func);
     task->state = PPOS_TASK_STATE_READY;
     queue_add(&readyQueue, task);
-    return task->id;
+    return 1;
 }
 
 void task_yield()
@@ -80,7 +85,6 @@ int task_join(task_t *task)
     if (task == NULL || task->state == PPOS_TASK_STATE_TERMINATED)
     {
         return task->exitCode;
-        ;
     }
     task_suspend(readyQueue, &readyQueue);
     task_resume(task);
