@@ -1,10 +1,16 @@
 #include "ppos.h"
-#include "ppos-core-globals.h"
+// #include "ppos-core-globals.h"
 #include "ppos-disk-manager.h"
 
 // ****************************************************************************
 // Coloque as suas modificações aqui,
 // p.ex. includes, defines variáveis, // estruturas e funções
+task_t *taskExec;   // Ponteiro para a TCB da tarefa em execucao
+task_t *readyQueue; // Ponteiro para a fila de tarefas prontas
+task_t *sleepQueue;
+
+void queue_add(task_t **queue, task_t *elem);
+void queue_remove(task_t **queue, task_t *elem);
 
 int sem_create(semaphore_t *s, int value)
 {
@@ -12,7 +18,7 @@ int sem_create(semaphore_t *s, int value)
     {
         return -1;
     }
-
+    // printf("teste\n");
     s->counter = value;
     s->queue = NULL;
     return 0;
@@ -23,31 +29,42 @@ int sem_down(semaphore_t *s)
     s->counter = s->counter - 1;
     if (s->counter < 0)
     {
-
-        //queue_add(s->queue, taskExec); // Coloca a tarefa na fila, implementar a função
-        //task_suspend(taskExec,&(s->queue)); // Suspende a tarefa, implementar funcção
+        task_suspend(taskExec, &(s->queue));
     }
     return 0;
 }
 
 int sem_up(semaphore_t *s)
 {
+    // printf("teste");
     s->counter = s->counter + 1;
     if (s->counter <= 0)
     {
-        task_resume(s->queue); // Devolve a Tarefa a fila de prontas, implementar
+        task_resume(s->queue);
     }
     return 0;
 }
 
 int sem_destroy(semaphore_t *s)
 {
-    return 0;
+    /*while (s->queue != NULL)
+    {
+        task_resume(s->queue); // Devolve a Tarefa a fila de prontas, implementar
+    }
+    return 0;*/
 }
 
 int task_create(task_t *task, void (*start_func)(void *), void *arg)
 {
+    if (readyQueue == NULL)
+    {
+        task_t *aux;
+        readyQueue = aux;
+    }
 
+    task->state = PPOS_TASK_STATE_READY;
+    queue_add(&readyQueue, task);
+    return task->id;
 }
 
 void task_yield()
@@ -60,12 +77,33 @@ void task_exit(int exitCode)
 
 int task_join(task_t *task)
 {
+    if (task == NULL || task->state == PPOS_TASK_STATE_TERMINATED)
+    {
+        return task->exitCode;
+        ;
+    }
+    task_suspend(readyQueue, &readyQueue);
+    task_resume(task);
+    return task->exitCode;
 }
 void task_suspend(task_t *task, task_t **queue)
 {
+    if (task->state == PPOS_TASK_STATE_READY)
+    {
+        task->state = PPOS_TASK_STATE_SUSPENDED;
+        queue_remove(&readyQueue, task);
+    }
+    queue_add(&sleepQueue, task);
+    task->state = PPOS_TASK_STATE_SUSPENDED;
 }
 void task_resume(task_t *task)
 {
+    if (task->state == PPOS_TASK_STATE_SUSPENDED)
+    {
+        queue_remove(&sleepQueue, task);
+    }
+    task->state = PPOS_TASK_STATE_READY;
+    queue_add(&readyQueue, task);
 }
 unsigned int systime()
 {
@@ -73,16 +111,21 @@ unsigned int systime()
 
 void ppos_init()
 {
+    setvbuf(stdout, 0, _IONBF, 0);
+    // printf("teste\n");
+    taskExec = NULL;
+    readyQueue = NULL;
+    sleepQueue = NULL;
 }
 
 void queue_add(task_t **queue, task_t *elem)
 {
     if (queue == NULL)
-        printf("a fila não existe");
+        printf("a fila não existe\n");
     if (elem == NULL)
-        printf("o elemento não existe");
+        printf("o elemento não existe\n");
     if (elem->prev != NULL || elem->next != NULL)
-        printf("o elemento está em outra fila");
+        printf("o elemento está em outra fila\n");
 
     if (*queue == NULL)
     {
@@ -101,7 +144,44 @@ void queue_add(task_t **queue, task_t *elem)
         elem->prev = last;
         elem->next = NULL;
     }
-    printf("teste");
+    // printf("teste");
+}
+
+void queue_remove(task_t **queue, task_t *elem)
+{
+    if (queue == NULL)
+        printf("a fila não existe\n");
+    if (elem == NULL)
+        printf("o elemento não existe\n");
+
+    if (*queue == NULL)
+    {
+        *queue = elem;
+        elem->prev = elem->next = NULL;
+    }
+    else
+    {
+        task_t *last = *queue;
+        while (last != elem && last != NULL)
+        {
+            last = last->next;
+        }
+        if (last == NULL)
+        {
+            printf("Elemento nao encontrado");
+            return;
+        }
+        if (last->next == NULL)
+        {
+            last->prev->next = NULL;
+            last->prev = NULL;
+            return;
+        }
+        last->prev->next = last->next;
+        last->prev = NULL;
+        last->next = NULL;
+    }
+    // printf("teste");
 }
 
 void before_ppos_init()
